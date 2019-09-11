@@ -29,10 +29,17 @@ class BoxingCoach(object):
 
     def run_round(self,round_len):
         start = time.time()
+        
         while(time.time() - start < round_len):
             current_move = self.all_moves[random.randint(0,len(self.all_moves)-1)]
             self.speak(current_move.get_file_name())
-            time.sleep(int(current_move.get_num_moves()) - 0.5)
+            time.sleep(int(current_move.get_num_moves()) + 1)
+
+    def one_combo(self,round_len,current_move):
+        start = time.time()
+        while(time.time() - start < round_len):
+            self.speak(current_move.get_file_name())
+            time.sleep(1)
 
     def run_match(self):
         for i in range(3):
