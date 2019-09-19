@@ -1,5 +1,5 @@
 class Move(object):
-    def __init__(self, moves, num_moves):
+    def __init__(self, moves, num_moves=1):
         self.moves = moves
         self.file_name = self.create_file_name()
         self.num_moves = num_moves
