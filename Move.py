@@ -1,7 +1,7 @@
 import pyttsx3
 
 class Move(object):
-    def __init__(self, move_name,move_time,rest_time=60):
+    def __init__(self, move_name,move_time,rest_time=30):
         self.move_name = move_name
         self.move_time = int(move_time)
         self.rest_time = int(rest_time)
@@ -33,6 +33,11 @@ class Circut_Move(Move):
         return self.sets
      
 class Boxing_Move(Move):
-    def __init__(self, move_name, move_time,rest_time=30):
+    def __init__(self, move_name, move_time,rest_time=60):
         return super().__init__(move_name, move_time,rest_time)
+    
+    def speak_move(self):
+        self.speak(self.move_name)
+    def speak_rest(self):
+        self.speak("Rest")
 
