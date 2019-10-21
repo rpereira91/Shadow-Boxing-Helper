@@ -54,7 +54,7 @@ class Circut_Helper(Helper):
         for move in self.current_circut:
             move.speak_upcoming()
             for i in range(move.get_sets()):
-                print(i+1)
+                move.speak("Set: " + str(i+1) + " of " + str(move.get_sets()))
                 move.speak_move()
                 self.count_down(move.get_move_time())
                 move.speak_rest()
@@ -76,21 +76,21 @@ class Combo_Helper(Helper):
             self.current_circut = []
             for row in readCSV:
                 self.current_circut.append(Boxing_Move(row[0],row[1]))
-    def run_round(self,round_len=180):
-        start = time.time()
+    def run_round(self,round_len=180,round=1,rnd_time = 30):
+        start = 0
         move_index = 0
-        while(time.time() - start < round_len):
-            if move_index >= len(self.current_circut):
-                move_index = 0
+        self.current_circut[0].speak("Round: " + str(round))
+        while(start < round_len):
+            move_index = random.randint(0,len(self.current_circut)-1)
             current_move = self.current_circut[move_index]
             current_move.speak_move()
-            self.count_down(current_move.get_move_time()*2)
-            move_index += 1
+            time.sleep(rnd_time)
+            start += rnd_time
         self.current_circut[0].speak_rest()
 
     def run_match(self,num_rounds=3,rest_time=60,round_len=180):
         for i in range(num_rounds):
-            self.run_round(round_len)
+            self.run_round(round_len,i+1)
             self.count_down(rest_time)
     
     def conditioning(self,round_len=60):
@@ -98,21 +98,76 @@ class Combo_Helper(Helper):
         for i in range(len(self.current_circut)):
             move = self.current_circut[i]
             print(move.move_name)
-            start = time.time()
-            while(time.time() - start < round_len):
-                move.speak_move()
-                self.count_down(move.get_move_time()*2)
-            if(i%3 == 0):
-                move.speak_rest()
-                self.count_down(30)
-            start = time.time()
-if __name__ == "__main__":
-    helper = Circut_Helper("workouts/abs.csv")
-    time.sleep(10)
+            move.speak_move()
+            self.count_down(30)
+def warm_up(total_time):
+    helper = Combo_Helper("workouts/warm-up.csv")
+    helper.conditioning()  
+def shadow_box(total_time,round_len = 180, rest = 60):
+    helper = Combo_Helper("workouts/combos.csv")
+    rounds = int((total_time*60)/(round_len+rest))
+    print(rounds)
+    helper.run_match(num_rounds=rounds, round_len=round_len,rest_time=rest)  
+def pull_workout():
+    helper = Circut_Helper("workouts/pull.csv")
     helper.run_workout()
-    # helper = Combo_Helper("workouts/heavy-bag-con.csv")
-    # helper.run_round(round_len=300)
-    # helper.conditioning()
-    # time.sleep(120)
-    # helper.run_match(num_rounds=4, round_len=120,rest_time=30)
+
+def push_workout():
+    helper = Circut_Helper("workouts/push.csv")
+    helper.run_workout()
+
+def legs_workout():
+    helper = Circut_Helper("workouts/legs.csv")
+    helper.run_workout()
+
+def abs_workout():
+    helper = Circut_Helper("workouts/abs.csv")
+    helper.run_workout()
+def convert_to_time(minutes):
+    left = minutes%60
+    print(left)
+    return("%d hours and %d minutes"  % (int(minutes/60) , int(left)))
+    # return [int(minutes/60) , left*(6/10)]
+def run_workout(heavy_bag = False):
+    start = time.time()
+    time.sleep(15)
+    warm_up(5)
+    print("Warm up complete, move to workout\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    time.sleep(30)
+    pull_workout()
+    time.sleep(30)
+    print("Workout complete, move to heavy bag\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    # print((time.time()-start)/60)
+    if heavy_bag:
+        time.sleep(300)
+    else:
+        time.sleep(60)
+    shadow_box(15,120,45)
+    # print((time.time() - start)/60)
+    print("Heavybag complete, move to abs\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    time.sleep(120)
+    abs_workout()
+    print((time.time()-start)/60)
+def cardio(heavy_bag = True):
+    start = time.time()
+    time.sleep(15)
+    # warm_up(5)
+    print("Warm up complete,  heavy bag\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    # print((time.time()-start)/60)
+    if heavy_bag:
+        time.sleep(300)
+    shadow_box(45,180,60)
+    # print((time.time() - start)/60)
+    time.sleep(120)
+    print("Heavybag complete, move to Vest\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    shadow_box(15,30,30)
+    print("Vest complete, move to abs\tTime: " + convert_to_time(int((time.time()-start)/60)))
+    time.sleep(120)
+    abs_workout()
+    print("Workout Complete, Time: " + convert_to_time(int(time.time()-start)/60))
+if __name__ == "__main__":
+    print(convert_to_time(97))
+    # run_workout(False)
+
+
         
